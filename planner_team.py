@@ -74,8 +74,7 @@ class ReflexCaptureAgent(CaptureAgent):
     return result
 
   def generatePDDLproblem(self): 
-	"""convierte un escenario en un problema de strips"""
-        cd = os.path.dirname(os.path.abspath(__file__))
+	cd = os.path.dirname(os.path.abspath(__file__))
 	f = open("%s/problem%d.pddl"%(cd,self.index),"w");
 	lines = list();
 	lines.append("(define (problem strips-log-x-1)\n");

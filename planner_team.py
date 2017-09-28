@@ -1,10 +1,3 @@
-# baselineAgents.py
-# -----------------
-# Licensing Information: Please do not distribute or publish solutions to this
-# project. You are free to use and extend these projects for educational
-# purposes. The Pacman AI projects were developed at UC Berkeley, primarily by
-# John DeNero (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
-# For more info, see http://inst.eecs.berkeley.edu/~cs188/sp09/pacman.html
 
 from captureAgents import CaptureAgent
 from captureAgents import AgentFactory
@@ -15,11 +8,6 @@ import keyboardAgents
 import game
 from util import nearestPoint
 import os
-
-
-#################
-# Team creation #
-#################
 
 
 def createTeam(firstIndex, secondIndex, isRed,
@@ -74,33 +62,31 @@ class ReflexCaptureAgent(CaptureAgent):
     return result
 
   def generatePDDLproblem(self): 
-	cd = os.path.dirname(os.path.abspath(__file__))
-	f = open("%s/problem%d.pddl"%(cd,self.index),"w");
-	lines = list();
-	lines.append("(define (problem strips-log-x-1)\n");
-   	lines.append("   (:domain pacman-strips)\n");
-   	lines.append("   (:objects \n");
-	lines.append( self.createPDDLobjects() + "\n");
-	lines.append(")\n");
-	lines.append("   (:init \n");
-	lines.append("   ;primero objetos \n");
-	lines.append( self.createPDDLfluents() + "\n");
+    cd = os.path.dirname(os.path.abspath(__file__))
+    f = open("%s/problem%d.pddl"%(cd,self.index),"w");
+    lines = list();
+    lines.append("(define (problem strips-log-x-1)\n");
+    lines.append("   (:domain pacman-strips)\n");
+    lines.append("   (:objects \n");
+    lines.append( self.createPDDLobjects() + "\n");
+    lines.append(")\n");
+    lines.append("   (:init \n");
+    lines.append("   ;primero objetos \n");
+    lines.append( self.createPDDLfluents() + "\n");
 
-        lines.append(")\n");
-        lines.append("   (:goal \n");
-        lines.append("	 ( and  \n");
-        lines.append( self.createPDDLgoal() + "\n");
-        lines.append("   ))\n");
-        lines.append(")\n");
-	    
-	f.writelines(lines);
-	f.close();	
-        
+    lines.append(")\n");
+    lines.append("   (:goal \n");
+    lines.append("	 ( and  \n");
+    lines.append( self.createPDDLgoal() + "\n");
+    lines.append("   ))\n");
+    lines.append(")\n");
+
+    f.writelines(lines);
+    f.close();
 
   def runPlanner( self ):
 	cd = os.path.dirname(os.path.abspath(__file__))
-	os.system("%s/ff  -o %s/domain.pddl -f %s/problem%d.pddl > %s/solution%d.txt"
-                %(cd,cd,cd,self.index,cd,self.index) );
+	os.system("%s/ff  -o %s/domain.pddl -f %s/problem%d.pddl > %s/solution%d.txt" %(cd,cd,cd,self.index,cd,self.index));
 
   def parseSolution( self ):
     cd = os.path.dirname(os.path.abspath(__file__))
@@ -229,19 +215,24 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
     # Computes whether we're on defense (1) or offense (0)
     features['onDefense'] = 1
-    if myState.isPacman: features['onDefense'] = 0
+    if myState.isPacman:
+      features['onDefense'] = 0
 
     # Computes distance to invaders we can see
     enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
     invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
+
     features['numInvaders'] = len(invaders)
     if len(invaders) > 0:
       dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
       features['invaderDistance'] = min(dists)
 
-    if action == Directions.STOP: features['stop'] = 1
+    if action == Directions.STOP:
+      features['stop'] = 1
     rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
-    if action == rev: features['reverse'] = 1
+
+    if action == rev:
+      features['reverse'] = 1
 
     return features
 

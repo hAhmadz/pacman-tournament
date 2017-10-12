@@ -21,7 +21,7 @@ def createTeam(firstIndex, secondIndex, isRed,first = 'DummyAgent', second = 'Du
   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
 
-class DummyAgent(CaptureAgent):
+class DummyAgent(CaptureAgent): #base class for agents behaviour
 
   def registerInitialState(self, gameState):
     CaptureAgent.registerInitialState(self, gameState)
@@ -31,7 +31,6 @@ class DummyAgent(CaptureAgent):
     '''
 
   def chooseAction(self, gameState):
-    #Picks among actions randomly.
-    actions = gameState.getLegalActions(self.index)
+    actions = gameState.getLegalActions(self.index) #Picks among actions randomly.
     return random.choice(actions)
 

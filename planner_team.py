@@ -21,7 +21,8 @@ import os
 def createTeam(firstIndex, secondIndex, isRed, first = 'OffensiveReflexAgent', second = 'DefensiveReflexAgent'):
   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
-class ReflexCaptureAgent(CaptureAgent):
+class ReflexCaptureAgent(CaptureAgent): #base class for agents behaviour
+
   def __init__( self, index, timeForComputing = .1 ):
     CaptureAgent.__init__( self, index, timeForComputing)
     self.visibleAgents = []
@@ -83,7 +84,10 @@ class ReflexCaptureAgent(CaptureAgent):
   # A base class for reflex agents that chooses score-maximizing actions
   def chooseAction(self, gameState):
     actions = gameState.getLegalActions(self.index)
-    bestAction = 'Stop'
+    bestAction = 'Stop' #default action is stop : updates later on
+
+    # Eval Time Start - Can Uncomment to evaluate function time (<15secs)
+    # start = time.time()
     self.generatePDDLproblem() #Start & Run Planner
     self.runPlanner()
     (newx,newy) = self.parseSolution()
@@ -93,6 +97,10 @@ class ReflexCaptureAgent(CaptureAgent):
       if succ.getAgentPosition( self.index ) == (newx, newy): #First action of plan
         bestAction = a
         print self.index, bestAction, self.getCurrentObservation().getAgentPosition( self.index ) ,(newx,newy) 
+
+    # Eval Time End
+    # print 'eval time for agent %d: %.4f' % (self.index, time.time() - start)
+
     return bestAction
 
   #Finds the next successor which is a grid position (location tuple).
@@ -125,7 +133,6 @@ class OffensiveReflexAgent(ReflexCaptureAgent): # Offensive Agent
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
     features['successorScore'] = self.getScore(successor)
-
     foodList = self.getFood(successor).asList() # Compute distance to the nearest food
     if len(foodList) > 0:
       myPos = successor.getAgentState(self.index).getPosition()

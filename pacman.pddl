@@ -20,12 +20,10 @@
             (powerPacman)
             ;;for adjoining index indices 
             (connected ?loc1 ?loc2 - index)
-            ;;time left for ghost to become active
-            (ghostTimer ?timeLeft - time)
             ;; mark homebase
-            (homeBase ?loc - index) 	
+            (homeBase ?loc - index)   
   ) 
-
+  
   ;;function to move pacman to next position
   (:action movePacMan
     ;;variables representing index positions of the ghost, before and 
@@ -41,17 +39,16 @@
                   )
     ;;Pacman position is updated to 'to' index
     ;;Pacman is not at 'from' index
-    :effect (and (pacman ?to)
-                 (not(pacman ?from))
+    :effect (and (pacmanLoc ?to)
+                 (not(pacmanLoc ?from))
                  (when(powerFoodLoc ?to)
-                      (and (not(powerFoodLoc))
+                      (and (not(powerFoodLoc ?to))
                       (powerPacman))                    
                   )
-                  
-                  (when (and (not(homeBase))
+                 (when (and (not(homeBase ?to))
                              (foodLoc ?to)                            
                          )
-                  (not (foodLoc ?to))
+                 (not (foodLoc ?to))
 
                   )
 

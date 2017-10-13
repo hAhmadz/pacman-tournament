@@ -1,6 +1,6 @@
 (define (domain ghost)
 
-  (:requirements :typing :conditional-effects :constraints) 
+  (:requirements :typing :conditional-effects) 
 
   ;; coordinates x and y on the state space are represented by the
   ;; index variable 
@@ -10,36 +10,33 @@
    ;;location of the static pacman
   (:predicates (pacmanLoc ?loc - index)
                ;;location of the ghost
-  			       (ghostLoc ?loc - index) 
-               ;;time left for ghost to become active
-               (ghostTimer ?timeLeft - time) 
+               (ghostLoc ?loc - index)  
                ;;if ghost is scared and cannot attack pacman
-  			       (ghostInActive)
+               (ghostInActive)
                ;;for adjoining index indices 
-  			       (connected ?loc1 ?loc2 - index) 
+               (connected ?loc1 ?loc2 - index) 
   ) 
 
   ;;Assumption: Pacman is static
-  (:action moveGhost
-    ;;variables representing index positions of the ghost, before and 
-    ;;after the move
-    :parameters (?from - index ?to - index)
-    ;;Ghost can move when its 'from' index and ghostLoc are the same 
-    ;;Ghost can move when from and to indices are cojoined
-    :precondition (and (ghostLoc ?from)
-                       (connected ?from ?to))
-    ;;Ghost position is updated to 'to' index
-    ;;Ghost is not at 'from' index
-    :effect (and (ghostLoc ?to)
-                 (not ghostLoc ?from)
-                 (when (not(ghostInActive)
-                  (not (pacmanLoc ?to))
-
-                 )
-            )
-
-            )
-  )
+    (:action moveGhost
+      ;;variables representing index positions of the ghost, before and 
+      ;;after the move
+      :parameters (?from - index ?to - index)
+      ;;Ghost can move when its 'from' index and ghostLoc are the same 
+      ;;Ghost can move when from and to indices are cojoined
+      :precondition (and (ghostLoc ?from)
+                         (connected ?from ?to))
+      ;;Ghost position is updated to 'to' index
+      ;;Ghost is not at 'from' index
+      :effect (and (ghostLoc ?to)
+                   (not (ghostLoc ?from))
+                     (when (not(ghostInActive))
+                           (not(pacmanLoc ?to))
+                     )
+                   )
+    )
+)
+  
 
 ;   (:action eatPacman
 ;     ;;variables representing index positions of the ghost, before and 

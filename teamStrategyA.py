@@ -225,3 +225,9 @@ class myCustomAgent(CaptureAgent):
                     return I_AM_ACTIVE_GHOST_ENEMY_FAR
 
         return I_AM_PACMAN_ENEMY_FAR
+
+    def getFoodDiff(self, gameState):
+        toEatFoodCount = len(self.getFood(gameState).asList())
+        toDefendFoodCount = len(self.getFoodYouAreDefending(gameState).asList())
+        foodDiff = toEatFoodCount - toDefendFoodCount
+        return foodDiff

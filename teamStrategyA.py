@@ -242,6 +242,7 @@ class myCustomAgent(CaptureAgent):
 
         return self.dotProduct(features, weights)
 
+
     def eatEnemy(self, gameState, action):
         # Provide feature
         features = util.Counter()
@@ -348,4 +349,27 @@ class myCustomAgent(CaptureAgent):
     def dotProduct(self, features, weights):
         return features * weights
 
+    def isPoweredPacman(self):
+        if self.Timer > 0:
+            return True
+        else:
+            return False
 
+    def isAgentonCapsule(self, agentPosition,gameState):
+        if agentPosition in self.getCapsules(gameState):
+            return True
+        else:
+            return False
+
+    def makePoweredPacman(self, agentPosition, gameState):
+        if self.isAgentonCapsule(agentPosition , gameState): #if agent is on a capsule loc, start timer
+            self.Timer = PowerCapTime
+
+        if self.Timer  > 0: #Timer-- for each iteration
+            self.Timer  -= 1
+
+    def getAgentPosition(self, currentPlayer): #currentPlayer = gameState.getAgentState(self.index)
+        return currentPlayer.getPosition()
+
+    def getDistances(self,gameState): #returns the noisy distances
+        return gameState.getAgentDistances()

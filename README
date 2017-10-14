@@ -1,0 +1,12 @@
+README
+
+Included for PDDL 
+
+1. Pacman.pddl - Pacman Domain file
+2. Ghost.pddl - Ghost Domain file
+3. pacProb1.pddl - Pacman problem: avoid ghost; eat two food
+4. ghostProb1.pddl - Ghost problem: eat pacman
+5. pacProb2.pddl - Pacman problem: avoid ghost; eat food; return to homebase
+6. ghostProb2.pddl - Ghost problem: avoid wall; eat pacman
+7. pacProb3.pddl - Pacman problem: avoid wall; avoid ghost; eat food dot; return to homebase
+8. ghostProb3.pddl - Ghost problem; eat two pacmans

@@ -463,6 +463,15 @@ class myCustomAgent(CaptureAgent):
 
         return totalDist
 
-
-
-
+    def getClosestApproximateDistance(self, gameState):
+        enemies = self.getOpponents(gameState)
+        ApproxDistances = gameState.getAgentDistances()
+        min = None
+        if len(ApproxDistances) > 0:
+            min = 9999
+            myLoc = gameState.getAgentPosition(self.index)
+            for enemyAgents in enemies:
+                dist = ApproxDistances[enemyAgents]
+                if dist < min:
+                    min = dist
+        return min

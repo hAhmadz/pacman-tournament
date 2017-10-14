@@ -67,9 +67,6 @@ class myCustomAgent(CaptureAgent):
         a = self.getFoodCount(gameState)
         foodLeft = len(self.getFood(gameState).asList())
 
-        dist = self.getClosestApproximateDistance(gameState)
-        print dist
-
         if foodLeft <= 2:
             bestDist = 9999
             for action in actions:

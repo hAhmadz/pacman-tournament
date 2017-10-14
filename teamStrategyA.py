@@ -360,3 +360,9 @@ class myCustomAgent(CaptureAgent):
 
         if self.Timer  > 0: #Timer-- for each iteration
             self.Timer  -= 1
+
+    def getAgentPosition(self, currentPlayer): #currentPlayer = gameState.getAgentState(self.index)
+        return currentPlayer.getPosition()
+
+    def getDistances(self,gameState): #returns the noisy distances
+        return gameState.getAgentDistances()

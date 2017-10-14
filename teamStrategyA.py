@@ -81,33 +81,77 @@ class myCustomAgent(CaptureAgent):
         # features = self.getFeatures(gameState, action)
         # weights = self.getWeights(gameState, action)
         # return features * weights
-        myState = gameState.getAgentState(self.index)
-        enemies = self.getOpponents(gameState)
-        isEnemyScared = False
+        def evaluate(self, gameState):
+            """
+            It returns global variable values and finds in which situation agent is
+            :param gameState:
+            :return:
+            """
+            myState = gameState.getAgentState(self.index)
+            enemies = self.getOpponents(gameState)
+            isEnemyScared = False
 
-        if len(self.getEnemyLocations(gameState)) > 0:
-            if not myState.isPacman:
-                if myState.scaredTimer > 0:
-                    return I_AM_SCARED_GHOST_ENEMY_CLOSE
+            if len(self.getEnemyLocations(gameState)) > 0:
+                if not myState.isPacman:
+                    if myState.scaredTimer > 0:
+                        """
+                        #return I_AM_SCARED_GHOST_ENEMY_CLOSE
+                        """
+                        self.eatFood(gameState, action)
+                    else:
+                        """
+                        if enemy in own area:
+                            #get closer to enemy while staying in your area
+                        elif
+                            eatEnemy(gameState,action)
+
+                        #return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
+                        """
                 else:
-                    return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
+                    for enemyIndex in enemies:
+                        if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
+                            isEnemyScared = True
+                            break
+                    if isEnemyScared:
+                        """
+                        #return I_AM_POWERED_PACMAN_ENEMY_CLOSE
+                        """
+                        if self.getMaz enemy is < 2 maze Distance away:
+                            eat Enemy
+                        else:
+                            self.eatFood(gameState,action)
+
+
+                    else:
+                        """
+                        if enemy is < 5 maze Distance away
+                            run to own side
+                        else
+                            run to closest food
+                        #return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE"""
             else:
-                for enemyIndex in enemies:
-                    if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
-                        isEnemyScared = True
-                        break
-                if isEnemyScared:
-                    return I_AM_POWERED_PACMAN_ENEMY_CLOSE
-                else:
-                    return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
-        else:
-            if not myState.isPacman:
-                if myState.scaredTimer > 0:
-                    return I_AM_SCARED_GHOST_ENEMY_FAR
-                else:
-                    return I_AM_ACTIVE_GHOST_ENEMY_FAR
+                if not myState.isPacman:
+                    if myState.scaredTimer > 0:
+                        """
+                        self.eatFood(gameState,action)
+                        #return I_AM_SCARED_GHOST_ENEMY_FAR
+                        """
+                    else:
+                        """
+                        if Last food is eaten
+                            Add position to global variable and run after that location
+                        else
+                            Apply advanced algo and do from the following:
+                                1. go to nearest food (become the pacman)
+                                2. check if partner needs help
 
-        return I_AM_PACMAN_ENEMY_FAR
+                        #return I_AM_ACTIVE_GHOST_ENEMY_FAR
+                        """
+
+            """
+            self.eatFood(gameState,action)
+            #return I_AM_PACMAN_ENEMY_FAR
+            """
 
     #
     # def getFeatures(self, gameState, action):
@@ -169,6 +213,7 @@ class myCustomAgent(CaptureAgent):
         return currentPlayer.isPacman
 
     def eatFood(self, gameState, action):
+        # Provide feature
         features = util.Counter()
         successor = self.getSuccessor(gameState, action)
         myLoc = self.getLocation(gameState, action)
@@ -179,6 +224,12 @@ class myCustomAgent(CaptureAgent):
             myPos = successor.getAgentState(self.index).getPosition()
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
+
+        #  Provide weight
+        weights = {'successorScore': 100, 'distanceToFood': -1}
+
+        return self.dotProduct(features, weights)
+
         return features
 
     def eatEnemy(self, gameState, action):
@@ -351,4 +402,8 @@ class myCustomAgent(CaptureAgent):
             return True
         else:
             return False
+
+    def dotProduct(self, features, weights):
+        return features * weights
+
 

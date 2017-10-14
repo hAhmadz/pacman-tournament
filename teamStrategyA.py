@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 from captureAgents import CaptureAgent
 import random, util
+import util
 from game import Directions
 from util import nearestPoint
 
@@ -139,6 +140,55 @@ class myCustomAgent(CaptureAgent):
     def PacmanInEnemyLoc(self, currentPlayer):
         return currentPlayer.isPacman
 
+    def eatFood(self, gameState, action):
+        features = util.Counter()
+        successor = self.getSuccessor(gameState, action)
+        myLoc = self.getLocation(gameState, action)
+        foodList = self.getFood(successor).asList()
+        features['successorScore'] = -len(foodList)  # self.getScore(successor)
+        self.getLocation(gameState, action)
+        if len(foodList) > 0:
+            myPos = successor.getAgentState(self.index).getPosition()
+            minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
+            features['distanceToFood'] = minDistance
+        return features
+
+    def eatEnemy(self, gameState, action):
+        features = util.Counter()
+        successor = self.getSuccessor(gameState, action)
+        myState = successor.getAgentState(self.index)
+        myPos = myState.getPosition()
+        myLoc = self.getLocation(gameState, action)
+
+        features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
+        if myState.isPacman: features['onDefense'] = 0
+
+        # current Pacman
+        currentPlayer = gameState.getAgentState(self.index)
+
+        self.isScared(currentPlayer)  # isScared function
+        self.PacmanInEnemyLoc(currentPlayer)  # is in Enemy Location function
+
+        # Computes distance to invaders we can see
+        enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
+        invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
+        features['numInvaders'] = len(invaders)
+        if len(invaders) > 0:
+            dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
+            features['invaderDistance'] = min(dists)
+
+        closest = self.getClosestEnemies(gameState)
+        if closest != None:
+            print "Enemy detected"
+        if action == Directions.STOP:
+            features['stop'] = 1
+        rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+        if action == rev:
+            features['reverse'] = 1
+
+        return features
+
+
         # ********************** for A Star ********************
 
     def nullHeuristic(state, problem=None):
@@ -225,3 +275,10 @@ class myCustomAgent(CaptureAgent):
                     return I_AM_ACTIVE_GHOST_ENEMY_FAR
 
         return I_AM_PACMAN_ENEMY_FAR
+
+    def isScared(self, currentPlayer):
+        if currentPlayer.scaredTimer > 0:
+            return True
+        else:
+            return False
+

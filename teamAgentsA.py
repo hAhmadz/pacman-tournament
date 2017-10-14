@@ -54,7 +54,6 @@ class TeamDefenderA(myCustomAgent):
       self.isScared(currentPlayer) #isScared function
       self.PacmanInEnemyLoc(currentPlayer) #is in Enemy Location function
 
-
       # Computes distance to invaders we can see
       enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
       invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]

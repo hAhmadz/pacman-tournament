@@ -93,17 +93,21 @@ class myCustomAgent(CaptureAgent):
         enemyLocation.append((enemyPlayers, location))
     return enemyLocation
 
+
+  #Capsules that are the closest
   def getClosestCapsules(self, gameState):
     capsules = self.getCapsules(gameState)
     min = None
+    closestCap = None
     if len(capsules) > 0:  # array has locations
       min = 9999  # random high dist
       myLoc = gameState.getAgentPosition(self.index)
-      for enemy, coords in location:
+      for coords in capsules:
         dist = self.getMazeDistance(coords, myLoc)
         if dist < min:
           min = dist
-    return min
+          closestCap = coords
+    return closestCap
 
 
   #Enemies that are the closest
@@ -118,6 +122,7 @@ class myCustomAgent(CaptureAgent):
         if dist < min:
           min = dist
     return min
+
 
   def PacmanInEnemyLoc(self, currentPlayer):
     return currentPlayer.isPacman

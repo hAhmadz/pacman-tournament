@@ -15,6 +15,23 @@ import random, util
 from game import Directions
 from util import nearestPoint
 
+I_AM_SCARED_GHOST_ENEMY_CLOSE = 0
+I_AM_ACTIVE_GHOST_ENEMY_CLOSE = 1
+I_AM_POWERED_PACMAN_ENEMY_CLOSE = 2
+I_AM_SIMPLE_PACMAN_ENEMY_CLOSE = 3
+I_AM_SCARED_GHOST_ENEMY_FAR = 4
+I_AM_ACTIVE_GHOST_ENEMY_FAR = 5
+I_AM_PACMAN_ENEMY_FAR = 6
+
+ans = []
+ans.append('I_AM_SCARED_GHOST_ENEMY_CLOSE')
+ans.append('I_AM_ACTIVE_GHOST_ENEMY_CLOSE')
+ans.append('I_AM_POWERED_PACMAN_ENEMY_CLOSE')
+ans.append('I_AM_SIMPLE_PACMAN_ENEMY_CLOSE')
+ans.append('I_AM_SCARED_GHOST_ENEMY_FAR')
+ans.append('I_AM_ACTIVE_GHOST_ENEMY_FAR')
+ans.append('I_AM_PACMAN_ENEMY_FAR')
+
 class myCustomAgent(CaptureAgent):
 
   def registerInitialState(self, gameState):
@@ -182,3 +199,38 @@ class myCustomAgent(CaptureAgent):
   def getFoodCount(self,gameState):
     foodCount = len(self.getFood(gameState).asList())
     return foodCount
+
+
+  def whoAmI(self, gameState):
+      """
+    It returns global variable values and finds in which situation agent is
+    :param gameState:
+    :return:
+    """
+      myState = gameState.getAgentState(self.index)
+      enemies = self.getOpponents(gameState)
+      isEnemyScared = False
+
+      if len(self.getEnemyLocations(gameState)) > 0:
+          if not myState.isPacman:
+              if myState.scaredTimer > 0:
+                  return I_AM_SCARED_GHOST_ENEMY_CLOSE
+              else:
+                  return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
+          else:
+              for enemyIndex in enemies:
+                  if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
+                      isEnemyScared = True
+                      break
+              if isEnemyScared:
+                  return I_AM_POWERED_PACMAN_ENEMY_CLOSE
+              else:
+                  return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
+      else:
+          if not myState.isPacman:
+              if myState.scaredTimer > 0:
+                  return I_AM_SCARED_GHOST_ENEMY_FAR
+              else:
+                  return I_AM_ACTIVE_GHOST_ENEMY_FAR
+
+      return I_AM_PACMAN_ENEMY_FAR

@@ -12,6 +12,7 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 from captureAgents import CaptureAgent
 import random, util
+from game import Directions
 from util import nearestPoint
 
 class myCustomAgent(CaptureAgent):
@@ -166,12 +167,12 @@ class myCustomAgent(CaptureAgent):
 
     # ********************** for A Star END ********************
 
-  def getClosestFood(self, foodList, pos):
-    closestFoodDist = None
-    closestFoodPos = None
+  def getClosestFood(self, foodList, position):
+    closestFood = -1
+    FoodPos = -1
     for food in foodList:
-      currFoodDist = self.distancer.getDistance(food, pos)
-      if closestFoodPos is None or currFoodDist < closestFoodDist:
-        closestFoodPos = food
-        closestFoodDist = currFoodDist
-    return (closestFoodPos, closestFoodDist)
+      currFoodDist = self.getMazeDistance(food, position)
+      if closestFood  is 0 or currFoodDist < closestFood:
+        FoodPos = food
+        closestFood = currFoodDist
+    return (FoodPos, closestFood)

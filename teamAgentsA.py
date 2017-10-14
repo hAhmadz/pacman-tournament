@@ -14,9 +14,10 @@ import util
 from teamStrategyA import myCustomAgent
 from game import Directions
 
-class TeamAttackerA(myCustomAgent):
+class TeamMember(myCustomAgent):
 
   def getFeatures(self, gameState, action):
+      #if attacker *************************
       features = util.Counter()
       successor = self.getSuccessor(gameState, action)
       myLoc = self.getLocation(gameState, action)
@@ -27,17 +28,10 @@ class TeamAttackerA(myCustomAgent):
           myPos = successor.getAgentState(self.index).getPosition()
           minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
           features['distanceToFood'] = minDistance
-      return features
 
-  def getWeights(self, gameState, action):
-      return {'successorScore': 100, 'distanceToFood': -1}
+      #***********************************************
 
-
-
-
-class TeamDefenderA(myCustomAgent):
-
-  def getFeatures(self, gameState, action):
+      #*******If Defense *****************************
       features = util.Counter()
       successor = self.getSuccessor(gameState, action)
       myState = successor.getAgentState(self.index)
@@ -47,12 +41,11 @@ class TeamDefenderA(myCustomAgent):
       features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
       if myState.isPacman: features['onDefense'] = 0
 
-
-      #current Pacman
+      # current Pacman
       currentPlayer = gameState.getAgentState(self.index)
 
-      self.isScared(currentPlayer) #isScared function
-      self.PacmanInEnemyLoc(currentPlayer) #is in Enemy Location function
+      self.isScared(currentPlayer)  # isScared function
+      self.PacmanInEnemyLoc(currentPlayer)  # is in Enemy Location function
 
       # Computes distance to invaders we can see
       enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
@@ -62,14 +55,9 @@ class TeamDefenderA(myCustomAgent):
           dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
           features['invaderDistance'] = min(dists)
 
-
       closest = self.getClosestEnemies(gameState)
       if closest != None:
-        print "Enemy detected"
-
-
-
-
+          print "Enemy detected"
 
       if action == Directions.STOP:
           features['stop'] = 1
@@ -77,7 +65,15 @@ class TeamDefenderA(myCustomAgent):
       if action == rev:
           features['reverse'] = 1
 
+      #**********************************************
+
       return features
+
+  def getWeights(self, gameState, action):
+      return {'successorScore': 100, 'distanceToFood': -1}
+
+  def getDefenderWeights(self, gameState, action):
+      return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
 
   def isScared(self, currentPlayer):
       if currentPlayer.scaredTimer > 0:
@@ -85,6 +81,5 @@ class TeamDefenderA(myCustomAgent):
       else:
         return False
 
-  def getWeights(self, gameState, action):
-      return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
+
 

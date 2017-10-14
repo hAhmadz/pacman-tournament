@@ -108,8 +108,6 @@ class ReflexCaptureAgent(myCustomAgent):
 
   def whoAmI(self, gameState):
       myState = gameState.getAgentState(self.index)
-
-
       print 'State: ', myState, myState.scaredTimer
       if len(self.getEnemyLocations(gameState)) > 0:
           if not myState.isPacman:
@@ -119,7 +117,6 @@ class ReflexCaptureAgent(myCustomAgent):
                   return i_am_active_ghost_enemy_close
           else:
               return 1
-
 
 """
 A reflex agent that seeks food. This is an agent

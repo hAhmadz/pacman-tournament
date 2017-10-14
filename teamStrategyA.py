@@ -176,3 +176,4 @@ class myCustomAgent(CaptureAgent):
         FoodPos = food
         closestFood = currFoodDist
     return (FoodPos, closestFood)
+

@@ -26,17 +26,27 @@ from game import Directions
 import game
 import time
 from util import nearestPoint
+from teamStrategyA import myCustomAgent
 
 #################
 # Team creation #
 #################
+
+i_am_scared_ghost_enemy_close = 0
+i_am_active_ghost_enemy_close = 1
+i_am_powered_pacman_enemy_close = 2
+i_am_simple_pacman_enemy_close = 3
+i_am_scared_ghost_enemy_far = 4
+i_am_active_ghost_enemy_far = 5
+i_am_powered_pacman_enemy_far = 6
+i_am_simple_pacman_enemy_far = 7
 
 def createTeam(firstIndex, secondIndex, isRed, first = 'OffensiveReflexAgent', second = 'DefensiveReflexAgent'):
   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
 
 # A base class for reflex agents that chooses score-maximizing actions
-class ReflexCaptureAgent(CaptureAgent):
+class ReflexCaptureAgent(myCustomAgent):
 
   def registerInitialState(self, gameState):
     self.start = gameState.getAgentPosition(self.index)
@@ -45,7 +55,6 @@ class ReflexCaptureAgent(CaptureAgent):
   # Picks among the actions with the highest Q(s,a).
   def chooseAction(self, gameState):
     actions = gameState.getLegalActions(self.index)
-
     # You can profile your evaluation time by uncommenting these lines
     # start = time.time()
     values = [self.evaluate(gameState, a) for a in actions]
@@ -55,7 +64,9 @@ class ReflexCaptureAgent(CaptureAgent):
     bestActions = [a for a, v in zip(actions, values) if v == maxValue]
 
     foodLeft = len(self.getFood(gameState).asList())
+    self.whoAmI(gameState)
     time.sleep(0.15)
+
     if foodLeft <= 2:
       bestDist = 9999
       for action in actions:
@@ -94,6 +105,20 @@ class ReflexCaptureAgent(CaptureAgent):
   #Normally, weights do not depend on the gamestate. They can be either a counter or a dictionary
   def getWeights(self, gameState, action):
     return {'successorScore': 1.0}
+
+  def whoAmI(self, gameState):
+      myState = gameState.getAgentState(self.index)
+
+
+      print 'State: ', myState, myState.scaredTimer
+      if len(self.getEnemyLocations(gameState)) > 0:
+          if not myState.isPacman:
+              if myState.scaredTimer > 0:
+                  return i_am_scared_ghost_enemy_close
+              else:
+                  return i_am_active_ghost_enemy_close
+          else:
+              return 1
 
 
 """
@@ -161,5 +186,3 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
   def getWeights(self, gameState, action):
     return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
 
-class Situation:
-    __init__

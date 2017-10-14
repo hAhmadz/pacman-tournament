@@ -11,10 +11,8 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
-import teamAgentsA
-PacmanTeamMember = str(teamAgentsA.TeamMember)
 
-def createTeam(firstIndex, secondIndex, isRed, first = PacmanTeamMember, second = PacmanTeamMember):
-  return [eval(first)(firstIndex), eval(second)(secondIndex)]
+# def createTeam(firstIndex, secondIndex, isRed, first = PacmanTeamMember, second = PacmanTeamMember):
+#   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
 

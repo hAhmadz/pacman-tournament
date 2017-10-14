@@ -107,24 +107,10 @@ class myCustomAgent(CaptureAgent):
                     """
                     return self.eatFood(gameState, action)
                 else:
-
-                    #if enemy in own area
-                    enemyLoc = self.getEnemyLocations(gameState)
-                    for enemyAgent,enemyCoords in enemyLoc:
-                        enemyPlayer = gameState.getAgentState(enemyAgent)
-                        enemyLoc = self.PacmanInEnemyLoc(enemyPlayer)
-                        if enemyLoc == True:
-                            """Enemy in own area"""
-                            return self.eatEnemy(gameState, action)
-                        else:
-                            # get closer to enemy while staying in your area
-
                     """
-                    if enemy in own area:
-                    else
-                    #return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
+                    return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
                     """
-
+                    return self.eatEnemy(gameState, action)
             else:
                 for enemyIndex in enemies:
                     if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
@@ -149,7 +135,6 @@ class myCustomAgent(CaptureAgent):
                     #return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
                     """
                     if self.powerTimer > 0:
-
                         return self.eatFood(gameState, action)
                     else:
                         return self.runOut(gameState, action, closeEnemies)
@@ -208,9 +193,6 @@ class myCustomAgent(CaptureAgent):
         features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
         if myState.isPacman: features['onDefense'] = 0
 
-        # current Pacman
-        currentPlayer = gameState.getAgentState(self.index)
-
         # Computes distance to invaders we can see
         enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
         invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
@@ -219,9 +201,6 @@ class myCustomAgent(CaptureAgent):
             dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
             features['invaderDistance'] = min(dists)
 
-        closest = self.getClosestEnemies(gameState)
-        # if closest != None:
-        #     print "Enemy detected"
         if action == Directions.STOP:
             features['stop'] = 1
         rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
@@ -312,7 +291,7 @@ class myCustomAgent(CaptureAgent):
         return closestCap
 
     # Enemies that are the closest
-    def getClosestEnemies(self, gameState):
+    def getClosestEnemiesDist(self, gameState):
         location = self.getEnemyLocations(gameState)
         min = None
         if len(location) > 0:  # array has locations
@@ -326,46 +305,6 @@ class myCustomAgent(CaptureAgent):
 
     def PacmanInEnemyLoc(self, currentPlayer):
         return currentPlayer.isPacman
-
-
-        # ********************** for A Star ********************
-
-    def nullHeuristic(state, problem=None):
-        return 0
-
-    def aStarSearch(problem, heuristic=nullHeuristic):
-        """Question 4"""
-        Queue_Astar = util.PriorityQueue()
-        currentStateXY = problem.getStartState()
-        currentStateAction = []
-        currentStateCost = 0
-        Queue_Astar.push([currentStateXY, currentStateAction, currentStateCost], heuristic(currentStateXY, problem))
-        visited = []
-
-        while not Queue_Astar.isEmpty():
-            currentState = Queue_Astar.pop()
-            currentStateXY = currentState[0]
-            currentStateAction = currentState[1]
-            currentStateCost = currentState[2]
-            if problem.isGoalState(currentStateXY):
-                return currentStateAction
-
-            if currentStateXY not in visited:
-                visited.append(currentStateXY)
-                successors = problem.getSuccessors(currentStateXY)
-                for children in successors:
-                    currentStateXY = children[0]
-                    currentDir = children[1]
-                    currentChildCost = children[2]
-
-                    allActions = currentStateAction + [currentDir]
-                    gN = problem.getCostOfActions(allActions)
-                    hN = heuristic(currentStateXY, problem)
-                    AStarTotalCost = gN + hN
-                    Queue_Astar.push((currentStateXY, allActions, gN), AStarTotalCost)
-        return []
-
-        # ********************** for A Star END ********************
 
     def getClosestFood(self, foodList, position):
         closestFood = -1
@@ -477,3 +416,18 @@ class myCustomAgent(CaptureAgent):
                 if dist < min:
                     min = dist
         return 0
+
+    """
+    #Commented code to track enemy location in own / your area
+    currentPlayer = gameState.getAgentState(self.index)
+    closestEnemies = self.getClosestEnemiesDist(gameState)
+    enemyLoc = self.getEnemyLocations(gameState)
+    for enemyAgent, enemyCoords in enemyLoc:
+        enemyPlayer = gameState.getAgentState(enemyAgent)
+        enemyLoc = self.PacmanInEnemyLoc(enemyPlayer)
+        agentLoc = self.PacmanInEnemyLoc(currentPlayer)
+        if enemyLoc == True:
+            #Enemy in your area
+        if enemyLoc == False and agentLoc == False:
+            #Enemy and agent both in own areas
+        """

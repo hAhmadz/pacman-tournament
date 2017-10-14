@@ -44,6 +44,7 @@ class myCustomAgent(CaptureAgent):
     def registerInitialState(self, gameState):
         self.start = gameState.getAgentPosition(self.index)
         self.powerTimer = 0
+        self.lastEatenFood = ()
         self.numCapsules = len(self.getCapsules(gameState))
         self.deadLockLength = 2 * max(gameState.data.layout.width, gameState.data.layout.height)
         CaptureAgent.registerInitialState(self, gameState)
@@ -94,10 +95,19 @@ class myCustomAgent(CaptureAgent):
         :param gameState:
         :return:
         """
+
+        enemies = self.getEnemyLocations()
+        print enemies[0].isPacman
+
         myState = gameState.getAgentState(self.index)
 
         enemies = self.getOpponents(gameState)
         closeEnemies = []
+
+        self.updateLastEatenFood(gameState)
+
+        if self.lastEatenFood:
+            return self.backToDefend(gameState, action)
 
         if len(self.getEnemyLocations(gameState)) > 0:
             if not myState.isPacman:
@@ -113,11 +123,12 @@ class myCustomAgent(CaptureAgent):
                     for enemyAgent,enemyCoords in enemyLoc:
                         enemyPlayer = gameState.getAgentState(enemyAgent)
                         enemyLoc = self.PacmanInEnemyLoc(enemyPlayer)
-                        if enemyLoc == True:
-                            """Enemy in own area"""
-                            return self.eatEnemy(gameState, action)
-                        else:
-                            # get closer to enemy while staying in your area
+                        # if enemyLoc == True:
+                        #     """Enemy in your area"""
+                        return self.eatEnemy(gameState, action)
+                        # else:
+                        #     # get closer to enemy while staying in your area
+                        #     return
 
                     """
                     if enemy in own area:
@@ -129,8 +140,9 @@ class myCustomAgent(CaptureAgent):
                 for enemyIndex in enemies:
                     if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
                         closeEnemies.append(enemyIndex)
-                    elif enemyIndex is not None:
-                        self.powerTimer = 0
+
+                    # elif enemyIndex is not None:
+                    #     self.powerTimer = 0
                 if self.isPoweredPacman():
                     """
                     #return I_AM_POWERED_PACMAN_ENEMY_CLOSE
@@ -206,7 +218,7 @@ class myCustomAgent(CaptureAgent):
         features, weights = self.initFeaturesWeights(gameState, action)
 
         features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
-        if myState.isPacman: features['onDefense'] = 0
+        # if myState.isPacman: features['onDefense'] = 0
 
         # current Pacman
         currentPlayer = gameState.getAgentState(self.index)
@@ -253,6 +265,23 @@ class myCustomAgent(CaptureAgent):
 
         #  Provide weight
         weights.update({'enemyDistance': 500, 'numEnemies': 500, 'isDeadLock': -100})
+
+        return self.dotProduct(features, weights)
+
+    def backToDefend(self, gameState, action):
+        # Provide feature
+        successor = self.getSuccessor(gameState, action)
+        myState = successor.getAgentState(self.index)
+        myPos = myState.getPosition()
+        features, weights = self.initFeaturesWeights(gameState, action)
+
+        features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
+        # if myState.isPacman: features['onDefense'] = 0
+
+        features['knownFarEnemy'] = self.getMazeDistance(myPos, self.lastEatenFood)
+
+        # Provide weight
+        weights.update({'onDefense': 100, 'knownFarEnemy': -200})
 
         return self.dotProduct(features, weights)
 
@@ -314,7 +343,7 @@ class myCustomAgent(CaptureAgent):
     # Enemies that are the closest
     def getClosestEnemies(self, gameState):
         location = self.getEnemyLocations(gameState)
-        min = None
+        min = 0
         if len(location) > 0:  # array has locations
             min = 9999  # random high dist
             myLoc = gameState.getAgentPosition(self.index)
@@ -477,3 +506,13 @@ class myCustomAgent(CaptureAgent):
                 if dist < min:
                     min = dist
         return 0
+
+    def updateLastEatenFood(self, gameState):
+        oldState = self.getPreviousObservation()
+        if oldState:
+            oldFoods = self.getFoodYouAreDefending(oldState).asList()
+            currentFoods = self.getFoodYouAreDefending(gameState).asList()
+
+            eaten = list(set(oldFoods) - set(currentFoods))
+            if len(eaten) > 0:
+                self.lastEatenFood = eaten[0]

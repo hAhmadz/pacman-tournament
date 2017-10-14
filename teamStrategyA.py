@@ -50,7 +50,33 @@ class myCustomAgent(CaptureAgent):
     print "chosen Action of Agent " + agent + ": " + random.choice(bestActions)
     return random.choice(bestActions)
 
+  def heuristic(self, state, problem):
+    # position, foodGrid = state
+    # food = foodGrid.asList()
+    position = state.getAgentPosition(self.index)
+    food = self.getFood(state).asList()
+    walls = problem.walls
 
+    heur = 0
+    c = None
+    for fd in food:
+      # x = distances[fd][position]
+      x = self.getMazeDistance(fd, position)
+      if c == None or x < self.getMazeDistance(c, position): c = fd
+    if c == None: return heur
+    # heur = distances[c][position]
+    heur = self.getMazeDistance(c, position)
+    if len(food) > 1:
+      for fd in food:
+        if fd != c:
+          closest = 99999
+          for nxt in food:
+            dist = self.getMazeDistance(fd, nxt)
+            # dist = distances[fd][nxt]
+            if nxt != fd and dist < closest:
+              closest = dist
+          heur += closest
+    return heur
 
   def getSuccessor(self, gameState, action):
     successor = gameState.generateSuccessor(self.index, action)
@@ -87,25 +113,29 @@ class myCustomAgent(CaptureAgent):
 
 
   #get the Enemy Position
-  def getEnemyPos(self, gameState):
-    enemyPos = []
-    for enemyI in self.getOpponents(gameState):
-      pos = gameState.getAgentPosition(enemyI)
-      #Will need inference if None
-      if pos != None:
-        enemyPos.append((enemyI, pos))
-    return enemyPos
+  def getEnemyLocations(self, gameState):
+    enemyLocation = []
+    for enemyPlayers in self.getOpponents(gameState):
+      location = gameState.getAgentPosition(enemyPlayers)
+      if location != None:
+        enemyLocation.append((enemyPlayers, location))
+    return enemyLocation
 
+  def getClosestCapsules(self, gameState):
+    capsule = self.getCapsules(gameState)
 
   #Enemies that are the closest
-  def enemyDist(self, gameState):
-    pos = self.getEnemyPos(gameState)
-    minDist = None
-    if len(pos) > 0:
-      minDist = float('inf')
-      myPos = gameState.getAgentPosition(self.index)
-      for i, p in pos:
-        dist = self.getMazeDistance(p, myPos)
-        if dist < minDist:
-          minDist = dist
-    return minDist
+  def getClosestEnemies(self, gameState):
+    location = self.getEnemyLocations(gameState)
+    min = None
+    if len(location) > 0: #array has locations
+      min = 9999 #random high dist
+      myLoc = gameState.getAgentPosition(self.index)
+      for enemy, coords in location:
+        dist = self.getMazeDistance(coords, myLoc)
+        if dist < min:
+          min = dist
+    return min
+
+  def PacmanInEnemyLoc(self, currentPlayer):
+    return currentPlayer.isPacman

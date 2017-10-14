@@ -50,7 +50,10 @@ class TeamDefenderA(myCustomAgent):
 
       #current Pacman
       currentPlayer = gameState.getAgentState(self.index)
-      self.isScared(currentPlayer)
+
+      self.isScared(currentPlayer) #isScared function
+      self.PacmanInEnemyLoc(currentPlayer) #is in Enemy Location function
+
 
       # Computes distance to invaders we can see
       enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
@@ -59,6 +62,15 @@ class TeamDefenderA(myCustomAgent):
       if len(invaders) > 0:
           dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
           features['invaderDistance'] = min(dists)
+
+
+      closest = self.getClosestEnemies(gameState)
+      if closest != None:
+        print "Enemy detected"
+
+
+
+
 
       if action == Directions.STOP:
           features['stop'] = 1

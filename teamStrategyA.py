@@ -66,6 +66,7 @@ class myCustomAgent(CaptureAgent):
         bestActions = [a for a, v in zip(actions, values) if v == maxValue]
         a = self.getFoodCount(gameState)
         foodLeft = len(self.getFood(gameState).asList())
+
         if foodLeft <= 2:
             bestDist = 9999
             for action in actions:
@@ -270,7 +271,6 @@ class myCustomAgent(CaptureAgent):
 
         # we should positively reward the distance between two partners
 
-
         return (features, weights)
 
     def getLocation(self, gameState, action):
@@ -435,6 +435,31 @@ class myCustomAgent(CaptureAgent):
             if depth <= 0:
                 return 0
         return 1
+
+    """
+    returns the minimum distance between a team
+    #Only assigns distance calc responsibility to one agent
+    Returns None if agent index == first index
+    else returns min distance    
+    """
+    def maintainPartnerDistance(self, gameState):
+        currPlayer = gameState.getAgentState(self.index)
+        teammate = None
+        totalDist = None
+
+        if self.index != self.getTeam(gameState)[0]: #Index calculation
+            teammate = self.getTeam(gameState)[0]
+            myLocation = self.getAgentPosition(currPlayer)
+            teamMateLocation = gameState.getAgentState(teammate).getPosition()
+
+            totalDist = self.getMazeDistance(myLocation, teamMateLocation)
+
+            # putting in a minimum distance if both are together
+            if totalDist == 0:
+                totalDist = 0.1
+
+        return totalDist
+
 
 
 

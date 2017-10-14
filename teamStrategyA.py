@@ -40,12 +40,12 @@ ans.append('I_AM_PACMAN_ENEMY_FAR')
 
 
 class myCustomAgent(CaptureAgent):
+
     def registerInitialState(self, gameState):
         self.start = gameState.getAgentPosition(self.index)
         self.powerTimer = 0
         self.numCapsules = len(self.getCapsules(gameState))
         self.deadLockLength = 2 * max(gameState.data.layout.width, gameState.data.layout.height)
-        # print "StartState: " + str(self.start)
         CaptureAgent.registerInitialState(self, gameState)
 
     def chooseAction(self, gameState):
@@ -78,13 +78,6 @@ class myCustomAgent(CaptureAgent):
                     bestDist = dist
             return bestAction
 
-        agent = ""
-        if (self.index == 1):
-            agent = "Dark Blue"
-        else:
-            agent = "Light Blue"  # index = 3
-
-        # print "chosen Action of Agent " + agent + ": " + random.choice(bestActions)
         return random.choice(bestActions)
 
     def getSuccessor(self, gameState, action):
@@ -192,7 +185,7 @@ class myCustomAgent(CaptureAgent):
             features['distanceToFood'] = minDistance
 
         # Provide weight
-        weights.update({'successorScore': 100, 'distanceToFood': -1})
+        weights.update({'successorScore': 100, 'distanceToFood': -10})
 
         return self.dotProduct(features, weights)
 

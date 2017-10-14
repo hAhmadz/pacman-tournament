@@ -147,6 +147,7 @@ class myCustomAgent(CaptureAgent):
                     #return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
                     """
                     if self.powerTimer > 0:
+
                         return self.eatFood(gameState, action)
                     else:
                         return self.runOut(gameState, action, closeEnemies)
@@ -267,9 +268,11 @@ class myCustomAgent(CaptureAgent):
         # We should negatively reward reverse action
         if action == rev:
             features['reverse'] = 1
-        weights = {'stop': -100, 'reverse': -20}
 
         # we should positively reward the distance between two partners
+        features['partnerDistance'] = self.maintainPartnerDistance(successor)
+
+        weights = {'stop': -100, 'reverse': -30, 'partnerDistance': .5}
 
         return (features, weights)
 
@@ -445,7 +448,7 @@ class myCustomAgent(CaptureAgent):
     def maintainPartnerDistance(self, gameState):
         currPlayer = gameState.getAgentState(self.index)
         teammate = None
-        totalDist = None
+        totalDist = 0
 
         if self.index != self.getTeam(gameState)[0]: #Index calculation
             teammate = self.getTeam(gameState)[0]

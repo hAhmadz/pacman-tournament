@@ -78,18 +78,46 @@ class myCustomAgent(CaptureAgent):
             return successor
 
     def evaluate(self, gameState, action):
-        features = self.getFeatures(gameState, action)
-        weights = self.getWeights(gameState, action)
-        return features * weights
+        # features = self.getFeatures(gameState, action)
+        # weights = self.getWeights(gameState, action)
+        # return features * weights
+        myState = gameState.getAgentState(self.index)
+        enemies = self.getOpponents(gameState)
+        isEnemyScared = False
 
-    def getFeatures(self, gameState, action):
-        features = util.Counter()
-        successor = self.getSuccessor(gameState, action)
-        features['successorScore'] = self.getScore(successor)
-        return features
+        if len(self.getEnemyLocations(gameState)) > 0:
+            if not myState.isPacman:
+                if myState.scaredTimer > 0:
+                    return I_AM_SCARED_GHOST_ENEMY_CLOSE
+                else:
+                    return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
+            else:
+                for enemyIndex in enemies:
+                    if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
+                        isEnemyScared = True
+                        break
+                if isEnemyScared:
+                    return I_AM_POWERED_PACMAN_ENEMY_CLOSE
+                else:
+                    return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
+        else:
+            if not myState.isPacman:
+                if myState.scaredTimer > 0:
+                    return I_AM_SCARED_GHOST_ENEMY_FAR
+                else:
+                    return I_AM_ACTIVE_GHOST_ENEMY_FAR
 
-    def getWeights(self, gameState, action):
-        return {'successorScore': 1.0}
+        return I_AM_PACMAN_ENEMY_FAR
+
+    #
+    # def getFeatures(self, gameState, action):
+    #     features = util.Counter()
+    #     successor = self.getSuccessor(gameState, action)
+    #     features['successorScore'] = self.getScore(successor)
+    #     return features
+    #
+    # def getWeights(self, gameState, action):
+    #     return {'successorScore': 1.0}
 
     def getLocation(self, gameState, action):
         successor = self.getSuccessor(gameState, action)

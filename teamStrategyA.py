@@ -23,6 +23,7 @@ I_AM_SIMPLE_PACMAN_ENEMY_CLOSE = 3
 I_AM_SCARED_GHOST_ENEMY_FAR = 4
 I_AM_ACTIVE_GHOST_ENEMY_FAR = 5
 I_AM_PACMAN_ENEMY_FAR = 6
+PowerCapTime = 120 # 120 turns
 
 ans = []
 ans.append('I_AM_SCARED_GHOST_ENEMY_CLOSE')
@@ -35,10 +36,14 @@ ans.append('I_AM_PACMAN_ENEMY_FAR')
 
 
 class myCustomAgent(CaptureAgent):
+    def __init__(self, gameState):
+        self.Timer = 0
+
     def registerInitialState(self, gameState):
         self.start = gameState.getAgentPosition(self.index)
         print "StartState: " + str(self.start)
         CaptureAgent.registerInitialState(self, gameState)
+
 
     def chooseAction(self, gameState):
         # start = time.time() #for time evaluation
@@ -337,4 +342,21 @@ class myCustomAgent(CaptureAgent):
     def dotProduct(self, features, weights):
         return features * weights
 
+    def isPoweredPacman(self):
+        if self.Timer > 0:
+            return True
+        else:
+            return False
 
+    def isAgentonCapsule(self, agentPosition,gameState):
+        if agentPosition in self.getCapsules(gameState):
+            return True
+        else:
+            return False
+
+    def makePoweredPacman(self, agentPosition, gameState):
+        if self.isAgentonCapsule(agentPosition , gameState): #if agent is on a capsule loc, start timer
+            self.Timer = PowerCapTime
+
+        if self.Timer  > 0: #Timer-- for each iteration
+            self.Timer  -= 1

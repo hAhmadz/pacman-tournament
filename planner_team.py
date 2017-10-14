@@ -57,8 +57,8 @@ class ReflexCaptureAgent(CaptureAgent): #base class for agents behaviour
     f.close();
 
   def runPlanner( self ):
-	cd = os.path.dirname(os.path.abspath(__file__))
-	os.system("%s/ff  -o %s/domain.pddl -f %s/problem%d.pddl > %s/solution%d.txt" %(cd,cd,cd,self.index,cd,self.index));
+	  cd = os.path.dirname(os.path.abspath(__file__))
+	  os.system("%s/ff  -o %s/domain.pddl -f %s/problem%d.pddl > %s/solution%d.txt" %(cd,cd,cd,self.index,cd,self.index));
 
   def parseSolution( self ):
     cd = os.path.dirname(os.path.abspath(__file__))

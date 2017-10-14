@@ -11,26 +11,11 @@
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
+import teamAgentsA
+PacmanAttack = str(teamAgentsA.TeamAttackerA)
+PacmanDefense = str(teamAgentsA.TeamDefenderA)
 
-from captureAgents import CaptureAgent
-import random, time, util
-from game import Directions
-import game
-
-def createTeam(firstIndex, secondIndex, isRed,first = 'DummyAgent', second = 'DummyAgent'):
+def createTeam(firstIndex, secondIndex, isRed, first = PacmanAttack, second = PacmanDefense):
   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
-
-class DummyAgent(CaptureAgent): #base class for agents behaviour
-
-  def registerInitialState(self, gameState):
-    CaptureAgent.registerInitialState(self, gameState)
-
-    '''
-    Your initialization code goes here, if you need any.
-    '''
-
-  def chooseAction(self, gameState):
-    actions = gameState.getLegalActions(self.index) #Picks among actions randomly.
-    return random.choice(actions)
 

@@ -12,10 +12,9 @@
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
 
 import teamAgentsA
-PacmanAttack = str(teamAgentsA.TeamAttackerA)
-PacmanDefense = str(teamAgentsA.TeamDefenderA)
+PacmanTeamMember = str(teamAgentsA.TeamMember)
 
-def createTeam(firstIndex, secondIndex, isRed, first = PacmanAttack, second = PacmanDefense):
+def createTeam(firstIndex, secondIndex, isRed, first = PacmanTeamMember, second = PacmanTeamMember):
   return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
 

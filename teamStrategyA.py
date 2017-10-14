@@ -30,7 +30,7 @@ class myCustomAgent(CaptureAgent):
     values = [self.evaluate(gameState, a) for a in actions]
     maxValue = max(values)
     bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-
+    a = self.getFoodCount(gameState)
     foodLeft = len(self.getFood(gameState).asList())
     if foodLeft <= 2:
       bestDist = 9999
@@ -48,6 +48,8 @@ class myCustomAgent(CaptureAgent):
       agent = "Dark Blue"
     else:
       agent = "Light Blue" #index = 3
+
+
 
 
     print "chosen Action of Agent " + agent + ": " + random.choice(bestActions)
@@ -139,7 +141,7 @@ class myCustomAgent(CaptureAgent):
     currentStateXY = problem.getStartState()
     currentStateAction = []
     currentStateCost = 0
-    Queue_Astar.push([currentStateXY, currentStateAction, currentStateCost], heuristic(currentStateXY, problem))
+    Queue_Astar.push( [currentStateXY, currentStateAction, currentStateCost], heuristic(currentStateXY, problem))
     visited = []
 
     while not Queue_Astar.isEmpty():
@@ -176,3 +178,7 @@ class myCustomAgent(CaptureAgent):
         FoodPos = food
         closestFood = currFoodDist
     return (FoodPos, closestFood)
+
+  def getFoodCount(self,gameState):
+    foodCount = len(self.getFood(gameState).asList())
+    return foodCount

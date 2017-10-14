@@ -14,7 +14,9 @@
                ;;if ghost is scared and cannot attack pacman
                (ghostInActive)
                ;;for adjoining index indices 
-               (connected ?loc1 ?loc2 - index) 
+               (connected ?loc1 ?loc2 - index)
+               ;; wall coordinates
+               (isWall ?loc - index) 
   ) 
 
   ;;Assumption: Pacman is static
@@ -25,7 +27,8 @@
       ;;Ghost can move when its 'from' index and ghostLoc are the same 
       ;;Ghost can move when from and to indices are cojoined
       :precondition (and (ghostLoc ?from)
-                         (connected ?from ?to))
+                         (connected ?from ?to)
+                         (not(isWall ?to)))
       ;;Ghost position is updated to 'to' index
       ;;Ghost is not at 'from' index
       :effect (and (ghostLoc ?to)

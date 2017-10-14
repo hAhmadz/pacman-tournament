@@ -14,10 +14,9 @@ import util
 from teamStrategyA import myCustomAgent
 from game import Directions
 
-class TeamMember(myCustomAgent):
+class TeamAttackerA(myCustomAgent):
 
   def getFeatures(self, gameState, action):
-      #if attacker *************************
       features = util.Counter()
       successor = self.getSuccessor(gameState, action)
       myLoc = self.getLocation(gameState, action)
@@ -55,9 +54,14 @@ class TeamMember(myCustomAgent):
           dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
           features['invaderDistance'] = min(dists)
 
+
       closest = self.getClosestEnemies(gameState)
       if closest != None:
           print "Enemy detected"
+
+
+
+
 
       if action == Directions.STOP:
           features['stop'] = 1
@@ -80,6 +84,4 @@ class TeamMember(myCustomAgent):
         return True
       else:
         return False
-
-
 

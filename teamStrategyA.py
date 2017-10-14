@@ -23,6 +23,8 @@ class myCustomAgent(CaptureAgent):
 
 
   def chooseAction(self, gameState):
+    #start = time.time() #for time evaluation
+
     actions = gameState.getLegalActions(self.index)
     values = [self.evaluate(gameState, a) for a in actions]
     maxValue = max(values)
@@ -109,7 +111,6 @@ class myCustomAgent(CaptureAgent):
           closestCap = coords
     return closestCap
 
-
   #Enemies that are the closest
   def getClosestEnemies(self, gameState):
     location = self.getEnemyLocations(gameState)
@@ -126,3 +127,51 @@ class myCustomAgent(CaptureAgent):
 
   def PacmanInEnemyLoc(self, currentPlayer):
     return currentPlayer.isPacman
+
+    # ********************** for A Star ********************
+  def nullHeuristic(state, problem=None):
+    return 0
+
+  def aStarSearch(problem, heuristic=nullHeuristic):
+    """Question 4"""
+    Queue_Astar = util.PriorityQueue()
+    currentStateXY = problem.getStartState()
+    currentStateAction = []
+    currentStateCost = 0
+    Queue_Astar.push([currentStateXY, currentStateAction, currentStateCost], heuristic(currentStateXY, problem))
+    visited = []
+
+    while not Queue_Astar.isEmpty():
+      currentState = Queue_Astar.pop()
+      currentStateXY = currentState[0]
+      currentStateAction = currentState[1]
+      currentStateCost = currentState[2]
+      if problem.isGoalState(currentStateXY):
+        return currentStateAction
+
+      if currentStateXY not in visited:
+        visited.append(currentStateXY)
+        successors = problem.getSuccessors(currentStateXY)
+        for children in successors:
+          currentStateXY = children[0]
+          currentDir = children[1]
+          currentChildCost = children[2]
+
+          allActions = currentStateAction + [currentDir]
+          gN = problem.getCostOfActions(allActions)
+          hN = heuristic(currentStateXY, problem)
+          AStarTotalCost = gN + hN
+          Queue_Astar.push((currentStateXY, allActions, gN), AStarTotalCost)
+    return []
+
+    # ********************** for A Star END ********************
+
+  def getClosestFood(self, foodList, pos):
+    closestFoodDist = None
+    closestFoodPos = None
+    for food in foodList:
+      currFoodDist = self.distancer.getDistance(food, pos)
+      if closestFoodPos is None or currFoodDist < closestFoodDist:
+        closestFoodPos = food
+        closestFoodDist = currFoodDist
+    return (closestFoodPos, closestFoodDist)

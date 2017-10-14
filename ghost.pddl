@@ -25,7 +25,8 @@
       ;;after the move
       :parameters (?from - index ?to - index)
       ;;Ghost can move when its 'from' index and ghostLoc are the same 
-      ;;Ghost can move when from and to indices are cojoined
+      ;;Ghost can move when from and to indices are cojoined 
+      ;;needs to avoid wall
       :precondition (and (ghostLoc ?from)
                          (connected ?from ?to)
                          (not(isWall ?to)))
@@ -41,25 +42,3 @@
 )
   
 
-;   (:action eatPacman
-;     ;;variables representing index positions of the ghost, before and 
-;     ;;after the move
-;     :parameters (?from - index ?to - index)
-;     ;;Ghost can eat PacMan when it is not inactive
-;     ;;Ghost can move when its 'from' index and ghostLoc are the same 
-;     ;;Ghost can move when from and to indices are cojoined
-;     ;;Ghost can eat PacMan if PacMan is at 'to' index
-;     :precondition (and (ghostLoc ?from)
-;                        (connected ?from ?to)
-;                        (pacmanLoc ?to)
-;                        (not(ghostInActive)))
-;     ;;Ghost position is updated to 'to' index
-;     ;;Ghost is not at 'from' index
-;     ;;PacMan is not at 'to' index
-;     :effect (and (ghostLoc ?to)
-;                  (not (ghostLoc ?from)
-;                  (not (pacman ?to)))
-
-;     )
-
-; )

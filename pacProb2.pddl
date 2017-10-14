@@ -1,4 +1,4 @@
-;;Pacman problem: avoid ghost; eat food; return to homebase
+;;Pacman problem: avoid wall; avoid ghost; eat food dot; return to homebase
 
 (define (problem pacProb1)
 (:domain pacman)
@@ -18,6 +18,11 @@
 
 	  (ghostLoc either i_2_3)	
 	  (food i_1_4)
+
+	  (isWall i_1_1)
+	  (isWall i_1_2)
+	  (isWall i_2_3)
+	  (isWall i_2_4)
 
 	  ;; defining the half of the grid tha tis pacmans home 
  	  (homeBase i_6_0) (homeBase i_6_1) (homeBase i_6_2)

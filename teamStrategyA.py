@@ -50,34 +50,6 @@ class myCustomAgent(CaptureAgent):
     print "chosen Action of Agent " + agent + ": " + random.choice(bestActions)
     return random.choice(bestActions)
 
-  def heuristic(self, state, problem):
-    # position, foodGrid = state
-    # food = foodGrid.asList()
-    position = state.getAgentPosition(self.index)
-    food = self.getFood(state).asList()
-    walls = problem.walls
-
-    heur = 0
-    c = None
-    for fd in food:
-      # x = distances[fd][position]
-      x = self.getMazeDistance(fd, position)
-      if c == None or x < self.getMazeDistance(c, position): c = fd
-    if c == None: return heur
-    # heur = distances[c][position]
-    heur = self.getMazeDistance(c, position)
-    if len(food) > 1:
-      for fd in food:
-        if fd != c:
-          closest = 99999
-          for nxt in food:
-            dist = self.getMazeDistance(fd, nxt)
-            # dist = distances[fd][nxt]
-            if nxt != fd and dist < closest:
-              closest = dist
-          heur += closest
-    return heur
-
   def getSuccessor(self, gameState, action):
     successor = gameState.generateSuccessor(self.index, action)
     pos = successor.getAgentState(self.index).getPosition()
@@ -122,7 +94,17 @@ class myCustomAgent(CaptureAgent):
     return enemyLocation
 
   def getClosestCapsules(self, gameState):
-    capsule = self.getCapsules(gameState)
+    capsules = self.getCapsules(gameState)
+    min = None
+    if len(capsules) > 0:  # array has locations
+      min = 9999  # random high dist
+      myLoc = gameState.getAgentPosition(self.index)
+      for enemy, coords in location:
+        dist = self.getMazeDistance(coords, myLoc)
+        if dist < min:
+          min = dist
+    return min
+
 
   #Enemies that are the closest
   def getClosestEnemies(self, gameState):

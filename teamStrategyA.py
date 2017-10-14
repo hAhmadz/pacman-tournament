@@ -107,15 +107,24 @@ class myCustomAgent(CaptureAgent):
                     """
                     return self.eatFood(gameState, action)
                 else:
+
+                    #if enemy in own area
+                    enemyLoc = self.getEnemyLocations(gameState)
+                    for enemyAgent,enemyCoords in enemyLoc:
+                        enemyPlayer = gameState.getAgentState(enemyAgent)
+                        enemyLoc = self.PacmanInEnemyLoc(enemyPlayer)
+                        if enemyLoc == True:
+                            """Enemy in own area"""
+                            return self.eatEnemy(gameState, action)
+                        else:
+                            # get closer to enemy while staying in your area
+
                     """
                     if enemy in own area:
-                        #get closer to enemy while staying in your area
-                    elif
-                        eatEnemy(gameState,action)
-
+                    else
                     #return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
                     """
-                    return self.eatEnemy(gameState, action)
+
             else:
                 for enemyIndex in enemies:
                     if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:

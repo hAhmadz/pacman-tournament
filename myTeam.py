@@ -24,6 +24,7 @@ import distanceCalculator
 import random, time, util, sys
 from game import Directions
 import game
+import time
 from util import nearestPoint
 
 #################
@@ -54,7 +55,7 @@ class ReflexCaptureAgent(CaptureAgent):
     bestActions = [a for a, v in zip(actions, values) if v == maxValue]
 
     foodLeft = len(self.getFood(gameState).asList())
-
+    time.sleep(0.15)
     if foodLeft <= 2:
       bestDist = 9999
       for action in actions:
@@ -129,6 +130,12 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
     features = util.Counter()
     successor = self.getSuccessor(gameState, action)
 
+    # If ghost is scared, there is no point to try to catch pacman.
+    if gameState.getAgentState(self.index).scaredTimer > 0:
+        flag = -1
+    else:
+        flag = 1
+
     myState = successor.getAgentState(self.index)
     myPos = myState.getPosition()
 
@@ -141,7 +148,7 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
     features['numInvaders'] = len(invaders)
     if len(invaders) > 0:
       dists = [self.getMazeDistance(myPos, a.getPosition()) for a in invaders]
-      features['invaderDistance'] = min(dists)
+      features['invaderDistance'] = flag * min(dists)
 
     if action == Directions.STOP:
       features['stop'] = 1
@@ -153,3 +160,6 @@ class DefensiveReflexAgent(ReflexCaptureAgent):
 
   def getWeights(self, gameState, action):
     return {'numInvaders': -1000, 'onDefense': 100, 'invaderDistance': -10, 'stop': -100, 'reverse': -2}
+
+class Situation:
+    __init__

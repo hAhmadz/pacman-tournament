@@ -1,6 +1,5 @@
 ;;Pacman problem: avoid wall; avoid ghost; eat food dot; return to homebase
-
-(define (problem pacProb1)
+(define (problem pacProb2)
 (:domain pacman)
 (:objects  			   	 	
 		   ;; grid of 6 by 6
@@ -16,8 +15,10 @@
 ;;defining initial state
 (:init
 
-	  (ghostLoc either i_2_3)	
-	  (food i_1_4)
+	  (pacmanLoc i_6_0)
+	  (ghostLoc i_4_3)	
+	  
+	  (foodLoc i_0_5)
 
 	  (isWall i_1_1)
 	  (isWall i_1_2)
@@ -97,16 +98,9 @@
 		  	(pacmanLoc i_3_2)
 		  	(pacmanLoc i_2_2)
 		  	(pacmanLoc i_1_2)
-		  	(pacmanLoc i_0_2)
-		 )
-  
-		 (not(ghostLoc i_1_4)) 
-
-	    )
+		  	(pacmanLoc i_0_2))
+		 
+		 (not(foodLoc i_0_5))) 
 
    )
-)
-
-
-
 )

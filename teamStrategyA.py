@@ -175,30 +175,6 @@ class myCustomAgent(CaptureAgent):
 
         return self.dotProduct(features, weights)
 
-    # def runOut(self, gameState, action, closeEnemies):
-    #     print "runout is running"
-    #     # time.sleep(0.5)
-    #     # Provide feature
-    #     features = util.Counter()
-    #     successor = self.getSuccessor(gameState, action)
-    #     myState = successor.getAgentState(self.index)
-    #     myPos = myState.getPosition()
-    #     features, weights = self.initFeaturesWeights(gameState, action)
-    #
-    #     for enemyIndex in closeEnemies:
-    #         enemyPos = gameState.getAgentState(enemyIndex).getPosition()
-    #         if enemyPos is not None:
-    #             features['enemyDistance'] += self.getMazeDistance(myPos, enemyPos)
-    #
-    #     features['numEnemies'] = len(closeEnemies)
-    #     # features['isDeadLock'] = self.isDeadLock(gameState, action)
-    #     # print action, features['isDeadLock']
-    #
-    #     #  Provide weight
-    #     weights.update({'enemyDistance': 8000, 'numEnemies': -10000})#, 'isDeadLock': -1000000})
-    #
-    #     return self.dotProduct(features, weights)
-
     def backToDefend(self, gameState, action):
         # print "backToDefend is running"
         # Provide feature
@@ -422,3 +398,27 @@ class myCustomAgent(CaptureAgent):
         # for enemyIndex in enemies:
         #     if self.pacmanInEnemyLoc(enemyIndex):
         #         self.lastEatenFood = ()
+
+    # def runOut(self, gameState, action, closeEnemies):
+    #     print "runout is running"
+    #     # time.sleep(0.5)
+    #     # Provide feature
+    #     features = util.Counter()
+    #     successor = self.getSuccessor(gameState, action)
+    #     myState = successor.getAgentState(self.index)
+    #     myPos = myState.getPosition()
+    #     features, weights = self.initFeaturesWeights(gameState, action)
+    #
+    #     for enemyIndex in closeEnemies:
+    #         enemyPos = gameState.getAgentState(enemyIndex).getPosition()
+    #         if enemyPos is not None:
+    #             features['enemyDistance'] += self.getMazeDistance(myPos, enemyPos)
+    #
+    #     features['numEnemies'] = len(closeEnemies)
+    #     # features['isDeadLock'] = self.isDeadLock(gameState, action)
+    #     # print action, features['isDeadLock']
+    #
+    #     #  Provide weight
+    #     weights.update({'enemyDistance': 8000, 'numEnemies': -10000})#, 'isDeadLock': -1000000})
+    #
+    #     return self.dotProduct(features, weights)

@@ -16,8 +16,9 @@
 ;;defining initial state
 (:init
 
-	  (ghostLoc either i_2_3)	
-	  (food i_1_4)
+      (pacmanLoc i_6_0)
+	  (ghostLoc i_2_3)	
+	  (foodLoc i_1_4)
 
 	  ;; defining the half of the grid tha tis pacmans home 
  	  (homeBase i_6_0) (homeBase i_6_1) (homeBase i_6_2)
@@ -92,16 +93,11 @@
 		  	(pacmanLoc i_3_2)
 		  	(pacmanLoc i_2_2)
 		  	(pacmanLoc i_1_2)
-		  	(pacmanLoc i_0_2)
-		 )
+		  	(pacmanLoc i_0_2))
   
-		 (not(ghostLoc i_1_4)) 
+		  (not(foodLoc i_1_4)) 
 
 	    )
 
    )
-)
-
-
-
 )

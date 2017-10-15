@@ -1,6 +1,5 @@
-;;Ghost problem: avoid wall; eat pacman
-(define (problem ghostProb1)
-(:domain phost)
+(define (problem ghostProb2)
+(:domain ghost)
 (:objects  			   	 	
 	
 		   i_6_0	i_6_1	i_6_2	i_6_3	i_6_4	i_6_5	

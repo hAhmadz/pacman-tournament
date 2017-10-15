@@ -44,6 +44,7 @@ class myCustomAgent(CaptureAgent):
     def registerInitialState(self, gameState):
         self.start = gameState.getAgentPosition(self.index)
         self.powerTimer = 0
+
         self.lastEatenFood = ()
         self.numCapsules = len(self.getCapsules(gameState))
         self.deadLockLength = 2 * max(gameState.data.layout.width, gameState.data.layout.height)
@@ -51,6 +52,7 @@ class myCustomAgent(CaptureAgent):
 
     def chooseAction(self, gameState):
         # start = time.time() #for time evaluation
+        print 'LEF = ', self.lastEatenFood
 
         myState = gameState.getAgentState(self.index)
 
@@ -65,7 +67,6 @@ class myCustomAgent(CaptureAgent):
         values = [self.evaluate(gameState, a) for a in actions]
         maxValue = max(values)
         bestActions = [a for a, v in zip(actions, values) if v == maxValue]
-        a = self.getFoodCount(gameState)
         foodLeft = len(self.getFood(gameState).asList())
 
         if foodLeft <= 2:
@@ -95,118 +96,57 @@ class myCustomAgent(CaptureAgent):
         :param gameState:
         :return:
         """
+        opponents = self.getOpponents(gameState)
+        successor = self.getSuccessor(gameState, action)
+        invaders = [agent for agent in opponents if successor.getAgentState(agent).isPacman]
+
         myState = gameState.getAgentState(self.index)
 
-        enemies = self.getOpponents(gameState)
-        closeEnemies = []
-
         self.updateLastEatenFood(gameState)
-
-        if len(self.getEnemyLocations(gameState)) > 0:
-            if not myState.isPacman:
-                if myState.scaredTimer > 0:
-                    """
-                    return I_AM_SCARED_GHOST_ENEMY_CLOSE
-                    """
-                    return self.eatFood(gameState, action)
-                else:
-
-                    #if enemy in own area
-                    enemyLoc = self.getEnemyLocations(gameState)
-                    for enemyAgent,enemyCoords in enemyLoc:
-                        enemyPlayer = gameState.getAgentState(enemyAgent)
-                        enemyLoc = self.pacmanInEnemyLoc(enemyPlayer)
-                        # if enemyLoc == True:
-                        #     """Enemy in your area"""
-
-                        return self.eatEnemy(gameState, action)
-                        # else:
-                        #     # get closer to enemy while staying in your area
-                        #     return
-
-                    """
-                    if enemy in own area:
-                    else
-                    #return I_AM_ACTIVE_GHOST_ENEMY_CLOSE
-                    """
-
-            else:
-                for enemyIndex in enemies:
-                    if enemyIndex is not None and gameState.getAgentState(enemyIndex).scaredTimer > 0:
-                        closeEnemies.append(enemyIndex)
-
-                    # elif enemyIndex is not None:
-                    #     self.powerTimer = 0
-                if self.isPoweredPacman():
-                    """
-                    #return I_AM_POWERED_PACMAN_ENEMY_CLOSE
-                    """
-                    # if self.getMazeDistance() enemy is < 2 maze Distance away:
-                    #     eat Enemy
-                    # else:
-                    return self.eatFood(gameState, action)
-
-                else:
-                    """
-                    if enemy is < 5 maze Distance away
-                        run to own side
-                    else
-                        run to closest food
-                    #return I_AM_SIMPLE_PACMAN_ENEMY_CLOSE
-                    """
-                    if self.powerTimer > 0:
-                        return self.eatFood(gameState, action)
-                    else:
-                        return self.runOut(gameState, action, closeEnemies)
-        else:
-            if not myState.isPacman:
-                if myState.scaredTimer > 0:
-                    """
-                    self.eatFood(gameState,action)
-                    #return I_AM_SCARED_GHOST_ENEMY_FAR
-                    """
-                    return self.eatFood(gameState, action)
-                else:
-                    """
-                    if Last food is eaten
-                        Add position to global variable and run after that location
-                    else
-                        Apply advanced algo and do from the following:
-                            1. go to nearest food (become the pacman)
-                            2. check if partner needs help
-
-                    #return I_AM_ACTIVE_GHOST_ENEMY_FAR
-                    """
-                    self.lastEatenFood = ()
-                    return self.eatFood(gameState, action)
-
-        """
-        self.eatFood(gameState,action)
-        #return I_AM_PACMAN_ENEMY_FAR
-        """
-        if self.lastEatenFood:
+        if len(invaders) > 0 or self.lastEatenFood:
+            """
+            If someone crossed to our area and tries to eat our food, back to own area
+            """
             return self.backToDefend(gameState, action)
+        elif len(self.getEnemyLocations(gameState)) > 0 and myState.isPacman and myState.scaredTimer == 0:
+            """
+            If agent is active ghost and enemy is close, defend
+            """
+            return self.eatEnemy(gameState, action)
+
+        """
+        otherwise
+        """
         return self.eatFood(gameState, action)
 
     def eatFood(self, gameState, action):
+        # print "eatFood is running"
         # Provide feature
         successor = self.getSuccessor(gameState, action)
         features, weights = self.initFeaturesWeights(gameState, action)
 
         foodList = self.getFood(successor).asList()
         features['successorScore'] = -len(foodList)  # self.getScore(successor)
-        self.getLocation(gameState, action)
+        myPos = successor.getAgentState(self.index).getPosition()
+        # self.getLocation(gameState, action)
+        flag = -float(successor.getAgentState(self.index).scaredTimer) / capture.SCARED_TIME
+        if flag == 0:
+            flag = 1
+
+        # Check how many foods we ate As our food count increases, try to go back to starting position
+        features['startingDistance'] = self.getMazeDistance(myPos, self.start) * flag
+
         if len(foodList) > 0:
-            myPos = successor.getAgentState(self.index).getPosition()
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
 
         # Provide weight
-        weights.update({'successorScore': 100, 'distanceToFood': -10})
+        weights.update({'successorScore': 500, 'distanceToFood': -100, 'startingDistance': 600})
 
         return self.dotProduct(features, weights)
 
     def eatEnemy(self, gameState, action):
+        # print "eatEnemy is running"
         # Provide feature
         successor = self.getSuccessor(gameState, action)
         myState = successor.getAgentState(self.index)
@@ -235,30 +175,32 @@ class myCustomAgent(CaptureAgent):
 
         return self.dotProduct(features, weights)
 
-    def runOut(self, gameState, action, closeEnemies):
-        # time.sleep(0.5)
-        # Provide feature
-        features = util.Counter()
-        successor = self.getSuccessor(gameState, action)
-        myState = successor.getAgentState(self.index)
-        myPos = myState.getPosition()
-        features, weights = self.initFeaturesWeights(gameState, action)
-
-        for enemyIndex in closeEnemies:
-            enemyPos = gameState.getAgentState(enemyIndex).getPosition()
-            if enemyPos is not None:
-                features['enemyDistance'] += self.getMazeDistance(myPos, enemyPos)
-
-        features['numEnemies'] = len(closeEnemies)
-        features['isDeadLock'] = self.isDeadLock(gameState, action)
-        # print action, features['isDeadLock']
-
-        #  Provide weight
-        weights.update({'enemyDistance': 8000, 'numEnemies': -10000, 'isDeadLock': -10000})
-
-        return self.dotProduct(features, weights)
+    # def runOut(self, gameState, action, closeEnemies):
+    #     print "runout is running"
+    #     # time.sleep(0.5)
+    #     # Provide feature
+    #     features = util.Counter()
+    #     successor = self.getSuccessor(gameState, action)
+    #     myState = successor.getAgentState(self.index)
+    #     myPos = myState.getPosition()
+    #     features, weights = self.initFeaturesWeights(gameState, action)
+    #
+    #     for enemyIndex in closeEnemies:
+    #         enemyPos = gameState.getAgentState(enemyIndex).getPosition()
+    #         if enemyPos is not None:
+    #             features['enemyDistance'] += self.getMazeDistance(myPos, enemyPos)
+    #
+    #     features['numEnemies'] = len(closeEnemies)
+    #     # features['isDeadLock'] = self.isDeadLock(gameState, action)
+    #     # print action, features['isDeadLock']
+    #
+    #     #  Provide weight
+    #     weights.update({'enemyDistance': 8000, 'numEnemies': -10000})#, 'isDeadLock': -1000000})
+    #
+    #     return self.dotProduct(features, weights)
 
     def backToDefend(self, gameState, action):
+        # print "backToDefend is running"
         # Provide feature
         successor = self.getSuccessor(gameState, action)
         myState = successor.getAgentState(self.index)
@@ -292,8 +234,9 @@ class myCustomAgent(CaptureAgent):
 
         # we should positively reward the distance between two partners
         features['partnerDistance'] = self.maintainPartnerDistance(successor)
+        features['isDeadLock'] = self.isDeadLock(gameState, action)
 
-        weights = {'stop': -1000, 'reverse': -100, 'partnerDistance': 55}
+        weights = {'stop': -100, 'reverse': -10, 'partnerDistance': 55, 'isDeadLock': -600}
 
         return (features, weights)
 

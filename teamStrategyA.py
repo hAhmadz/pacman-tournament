@@ -119,7 +119,7 @@ class myCustomAgent(CaptureAgent):
         return self.eatFood(gameState, action)
 
     def eatFood(self, gameState, action):
-        print "eat Food"
+        # print "eat Food"
         # Provide feature
         successor = self.getSuccessor(gameState, action)
         width = gameState.data.layout.width
@@ -193,7 +193,7 @@ class myCustomAgent(CaptureAgent):
             # distanceToAgent is always None for one of the agents (so they don't get stuck)
             if partnerDistance is not None:
                 features['partnerDistance'] = 1.0 / partnerDistance
-                weights.update({'partnerDistance': -6000})
+                weights.update({'partnerDistance': -3000})
 
         features['isDeadLock'] = self.isDeadLock(gameState, action)
         weights.update({'partnerDistance': -200})

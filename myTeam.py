@@ -10,6 +10,13 @@
 # (denero@cs.berkeley.edu) and Dan Klein (klein@cs.berkeley.edu).
 # Student side autograding was added by Brad Miller, Nick Hay, and
 # Pieter Abbeel (pabbeel@cs.berkeley.edu).
+
+"""
+@Author Bahridden Abdiev (824110): babdiev@student.unimelb.edu.au
+@Author Haaris Nazir Ahmad (869969): haarisa@student.unimelb.edu.au
+@Author Kriti Bhardwaj (880873): bhardwajk@student.unimelb.edu.au
+"""
+
 from captureAgents import CaptureAgent
 import random, capture
 import util
@@ -21,22 +28,22 @@ import time
 def createTeam(firstIndex, secondIndex, isRed, first='myCustomAgent', second='myCustomAgent'):
     return [eval(first)(firstIndex), eval(second)(secondIndex)]
 
-I_AM_SCARED_GHOST_ENEMY_CLOSE = 0
-I_AM_ACTIVE_GHOST_ENEMY_CLOSE = 1
-I_AM_POWERED_PACMAN_ENEMY_CLOSE = 2
-I_AM_SIMPLE_PACMAN_ENEMY_CLOSE = 3
-I_AM_SCARED_GHOST_ENEMY_FAR = 4
-I_AM_ACTIVE_GHOST_ENEMY_FAR = 5
-I_AM_PACMAN_ENEMY_FAR = 6
-
-ans = []
-ans.append('I_AM_SCARED_GHOST_ENEMY_CLOSE')
-ans.append('I_AM_ACTIVE_GHOST_ENEMY_CLOSE')
-ans.append('I_AM_POWERED_PACMAN_ENEMY_CLOSE')
-ans.append('I_AM_SIMPLE_PACMAN_ENEMY_CLOSE')
-ans.append('I_AM_SCARED_GHOST_ENEMY_FAR')
-ans.append('I_AM_ACTIVE_GHOST_ENEMY_FAR')
-ans.append('I_AM_PACMAN_ENEMY_FAR')
+# I_AM_SCARED_GHOST_ENEMY_CLOSE = 0
+# I_AM_ACTIVE_GHOST_ENEMY_CLOSE = 1
+# I_AM_POWERED_PACMAN_ENEMY_CLOSE = 2
+# I_AM_SIMPLE_PACMAN_ENEMY_CLOSE = 3
+# I_AM_SCARED_GHOST_ENEMY_FAR = 4
+# I_AM_ACTIVE_GHOST_ENEMY_FAR = 5
+# I_AM_PACMAN_ENEMY_FAR = 6
+#
+# ans = []
+# ans.append('I_AM_SCARED_GHOST_ENEMY_CLOSE')
+# ans.append('I_AM_ACTIVE_GHOST_ENEMY_CLOSE')
+# ans.append('I_AM_POWERED_PACMAN_ENEMY_CLOSE')
+# ans.append('I_AM_SIMPLE_PACMAN_ENEMY_CLOSE')
+# ans.append('I_AM_SCARED_GHOST_ENEMY_FAR')
+# ans.append('I_AM_ACTIVE_GHOST_ENEMY_FAR')
+# ans.append('I_AM_PACMAN_ENEMY_FAR')
 
 
 class myCustomAgent(CaptureAgent):
@@ -129,7 +136,7 @@ class myCustomAgent(CaptureAgent):
 
         foodList = self.getFood(successor).asList()
         features['successorScore'] = self.getScore(successor)  # self.getScore(successor)
-        weights.update({'successorScore': 800})
+        weights.update({'successorScore': 160})
         myPos = successor.getAgentState(self.index).getPosition()
 
         # Check how many foods we ate as our food count increases, try to go back to starting position
@@ -139,7 +146,7 @@ class myCustomAgent(CaptureAgent):
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
             features['eatFood'] = 100 * self.getScore(successor) - len(foodList)
-            weights.update({'eatFood': 4000, 'distanceToFood': -10})
+            weights.update({'eatFood': 800, 'distanceToFood': -2})
 
         # If there is a reason to warning
         minDistEnemy = self.getClosestEnemiesDist(successor)
@@ -150,23 +157,14 @@ class myCustomAgent(CaptureAgent):
                 features['warning'] = 1
             else:
                 features['warning'] = 0
-            weights.update({'warning': -1000})
+            weights.update({'warning': -200})
 
-        # How close to the power capsule
-        powerCapsules = self.getCapsules(successor)
-        if (len(powerCapsules) > 0):
-            minCapsuleDist = min([self.getMazeDistance(myPos, powerCapsule) for powerCapsule in powerCapsules])
-            features['collectPowerCapsule'] = -len(powerCapsules)
-        else:
-            minCapsuleDist = .1
-        features['powerCapsuleDist'] = 1.0 / minCapsuleDist
-        weights.update({'collectPowerCapsule': 5000, 'powerCapsuleDist': 700})
 
-        if successor.getAgentState(self.index).isPacman:
-            switch = 1.0
-        else:
-            switch = 0.0
         # If I am eating food from opposite side
+        if successor.getAgentState(self.index).isPacman:
+            switch = 1.0 #if i am pacman
+        else:
+            switch = 0.0 #if i am ghost
         if myPos in self.getFood(gameState).asList():
             self.collectedFoods += 1.0
         if switch == 0.0:
@@ -176,7 +174,17 @@ class myCustomAgent(CaptureAgent):
                      in range(1, height) if not gameState.hasWall(width / 2, i)]])) * switch
         # If I need to drop the food
         features['deposit'] = self.collectedFoods * switch
-        weights.update({'collectedFood': -20, 'deposit': 100})
+        weights.update({'collectedFood': -4, 'deposit': 20})
+
+        # How close to the power capsule
+        powerCapsules = self.getCapsules(successor)
+        if (len(powerCapsules) > 0):
+            minCapsuleDist = min([self.getMazeDistance(myPos, powerCapsule) for powerCapsule in powerCapsules])
+            features['collectPowerCapsule'] = -len(powerCapsules)
+        else:
+            minCapsuleDist = .1
+        features['powerCapsuleDist'] = 1.0 / minCapsuleDist
+        weights.update({'collectPowerCapsule': 1000, 'powerCapsuleDist': 140})
 
         # Is powered heuristic
         if self.powerTimer > 0:
@@ -185,7 +193,7 @@ class myCustomAgent(CaptureAgent):
             features['eatFood'] = 100 * features['eatFood']
         else:
             features['powered'] = 0.0
-        weights.update({'powered': 5000000})
+        weights.update({'powered': 1000000})
 
         # Distance to the partner
         if successor.getAgentState(self.index).isPacman:
@@ -193,17 +201,17 @@ class myCustomAgent(CaptureAgent):
             # distanceToAgent is always None for one of the agents (so they don't get stuck)
             if partnerDistance is not None:
                 features['partnerDistance'] = 1.0 / partnerDistance
-                weights.update({'partnerDistance': -3000})
+                weights.update({'partnerDistance': -600})
 
         features['isDeadLock'] = self.isDeadLock(gameState, action)
-        weights.update({'partnerDistance': -200})
+        weights.update({'partnerDistance': -40})
 
         # We shouldn't stop in most cases
         if action == Directions.STOP:
             features['stop'] = 1.0
         else:
             features['stop'] = 0.0
-        weights.update({'stop': -1000})
+        weights.update({'stop': -200})
 
         return self.dotProduct(features, weights)
 
@@ -227,7 +235,14 @@ class myCustomAgent(CaptureAgent):
             features['attackerDistance'] = min(dists)
         weights.update({'numAttacker': -200, 'attackerDistance': -20})
 
-        #strategise based on direction of enemy action
+        #Strategise based on distance to team memeber
+        if self.pacmanInEnemyLoc(myState):
+            partnerDist = self.maintainPartnerDistance(gameState)
+            if partnerDist != 0:
+                features['partnerDist'] = 1
+                weights.update({'partnerDist': -5000})
+
+        # strategise based on direction of enemy action
         if action == Directions.STOP:
             features['stop'] = 1
             weights.update({'stop': -10000})
@@ -236,13 +251,6 @@ class myCustomAgent(CaptureAgent):
         if action == rev:
             features['reverse'] = 1
             weights.update({'reverse': -10000})
-
-        #Strategise based on distance to team memeber
-        if self.pacmanInEnemyLoc(myState):
-            partnerDist = self.maintainPartnerDistance(gameState)
-            if partnerDist != 0:
-                features['partnerDist'] = 1
-                weights.update({'partnerDist': -5000})
 
         return self.dotProduct(features, weights)
 
@@ -256,6 +264,12 @@ class myCustomAgent(CaptureAgent):
         # features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
         # weights.update({'onDefense': -10})
 
+        # identify distance to teammate
+        if self.pacmanInEnemyLoc(myState):
+            partnerDist = self.maintainPartnerDistance(gameState)
+            if partnerDist != 0:
+                features['partnerDist'] = 1
+
         #identifies close enemies. brk
         closeEnemies = [en for en in enemies if successor.getAgentState(en).isPacman]
 
@@ -267,19 +281,13 @@ class myCustomAgent(CaptureAgent):
         if action == rev:
             features['reverse'] = 1
 
-        #identifies known locations of enemies based on last food eaten.
+        # identifies known locations of enemies based on last food eaten.
         if self.lastEatenFood is not None:
             features['knownFarEnemy'] = self.getMazeDistance(myPos, self.lastEatenFood)
-            weights.update({'knownFarEnemy': -10})
+            weights.update({'knownFarEnemy': -2})
 
-        #identify distance to teammate
-        if self.pacmanInEnemyLoc(myState):
-            partnerDist = self.maintainPartnerDistance(gameState)
-            if partnerDist != 0:
-                features['partnerDist'] = 1
-
-        weights.update({'stop': -5000, 'reverse': -5000,
-                        'closeEnemies': -100,'partnerDist': -2500})
+        weights.update({'stop': -1000, 'reverse': -1000,
+                        'closeEnemies': -20,'partnerDist': -500})
         return self.dotProduct(features, weights)
 
     def initFeaturesWeights(self, gameState, action):

@@ -45,15 +45,13 @@ class myCustomAgent(CaptureAgent):
         self.start = gameState.getAgentPosition(self.index)
         self.powerTimer = 0
 
-        self.lastEatenFood = ()
+        self.lastEatenFood = None
         self.numCapsules = len(self.getCapsules(gameState))
         self.deadLockLength = 2 * max(gameState.data.layout.width, gameState.data.layout.height)
         CaptureAgent.registerInitialState(self, gameState)
 
     def chooseAction(self, gameState):
         # start = time.time() #for time evaluation
-        print 'LEF = ', self.lastEatenFood
-
         myState = gameState.getAgentState(self.index)
 
         if len(self.getCapsules(gameState)) < self.numCapsules:
@@ -114,9 +112,6 @@ class myCustomAgent(CaptureAgent):
             """
             return self.eatEnemy(gameState, action)
 
-        """
-        otherwise
-        """
         return self.eatFood(gameState, action)
 
     def eatFood(self, gameState, action):
@@ -128,35 +123,27 @@ class myCustomAgent(CaptureAgent):
         foodList = self.getFood(successor).asList()
         features['successorScore'] = -len(foodList)  # self.getScore(successor)
         myPos = successor.getAgentState(self.index).getPosition()
-        # self.getLocation(gameState, action)
         flag = -float(successor.getAgentState(self.index).scaredTimer) / capture.SCARED_TIME
         if flag == 0:
             flag = 1
 
-        # Check how many foods we ate As our food count increases, try to go back to starting position
+        # Check how many foods we ate as our food count increases, try to go back to starting position
         features['startingDistance'] = self.getMazeDistance(myPos, self.start) * flag
 
         if len(foodList) > 0:
             minDistance = min([self.getMazeDistance(myPos, food) for food in foodList])
             features['distanceToFood'] = minDistance
 
-        # Provide weight
         weights.update({'successorScore': 500, 'distanceToFood': -100, 'startingDistance': 600})
-
         return self.dotProduct(features, weights)
 
     def eatEnemy(self, gameState, action):
-        # print "eatEnemy is running"
-        # Provide feature
         successor = self.getSuccessor(gameState, action)
         myState = successor.getAgentState(self.index)
         myPos = myState.getPosition()
         features, weights = self.initFeaturesWeights(gameState, action)
 
         features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
-        # if myState.isPacman: features['onDefense'] = 0
-
-        # Computes distance to invaders we can see
         enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
         invaders = [a for a in enemies if a.isPacman and a.getPosition() != None]
         features['numEnemies'] = len(invaders)
@@ -170,26 +157,111 @@ class myCustomAgent(CaptureAgent):
         if action == rev:
             features['reverse'] = 1
 
-        # Provide weight
         weights.update({'numEnemies': -2000, 'onDefense': 1000, 'enemyDistance': -500})
-
         return self.dotProduct(features, weights)
 
     def backToDefend(self, gameState, action):
-        # print "backToDefend is running"
-        # Provide feature
+
+        #getFeatureHunt
+
+
+        """
+        features = util.Counter()
+        successor = self.getSuccessor(gameState, action)
+        myState = successor.getAgentState(self.index)
+        myPos = myState.getPosition()
+
+        # Get opponents and invaders
+        opponents = self.getOpponents(gameState)
+        invaders = [agent for agent in opponents if successor.getAgentState(agent).isPacman]
+
+        # Find number of invaders
+        features['numInvaders'] = len(invaders)
+
+        # For each invader, calulate its most likely poisiton and distance
+        enemyDist = 0
+        for agent in invaders:
+            enemyPos = self.mostlikely[agent]
+            enemyDist = self.getMazeDistance(myPos, enemyPos)
+            try:
+                enemyDist
+            except NameError:
+                enemyDist = None
+
+            # Test whether variable is defined to be None
+            if enemyDist is None:
+                enemyDist = 0
+        features['invaderDistance'] = enemyDist
+
+        # Compute distance to partner
+        if self.inEnemyTerritory(successor):
+            distanceToAlly = self.getDistToPartner(successor)
+            # distanceToAgent is always None for one of the agents (so they don't get stuck)
+            if distanceToAlly != None:
+                features['distanceToAlly'] = 1.0 / distanceToAlly
+
+        if action == Directions.STOP: features['stop'] = 1
+        rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+        if action == rev: features['reverse'] = 1
+
+        return features
+
+
+
+        #getFeatureDefend
+
+        features = util.Counter()
+        successor = self.getSuccessor(gameState, action)
+
+        # Get own position
+        myState = successor.getAgentState(self.index)
+        myPos = myState.getPosition()
+
+        # List invaders we can see
+        enemies = [successor.getAgentState(i) for i in self.getOpponents(successor)]
+        invaders = [enemy for enemy in enemies if enemy.isPacman and enemy.getPosition() != None]
+
+        # Get number of invaders
+        features['numInvaders'] = len(invaders)
+        if len(invaders) > 0:
+            enemyDist = [self.getMazeDistance(myPos, enemy.getPosition()) for enemy in invaders]
+            # Find closest invader
+            features['invaderDistance'] = min(enemyDist)
+
+        # Compute distance to enemy
+        distEnemy = self.enemyDist(successor)
+        if (distEnemy <= 5):
+            features['danger'] = 1
+            if (distEnemy <= 1 and self.ScaredTimer(successor) > 0):
+                features['danger'] = -1
+        else:
+            features['danger'] = 0
+
+            # Compute distance to partner
+        if self.inEnemyTerritory(successor):
+            distanceToAlly = self.getDistToPartner(successor)
+            # distanceToAgent is always None for one of the agents (so they don't get stuck)
+            if distanceToAlly != None:
+                features['distanceToAlly'] = 1.0 / distanceToAlly
+
+        if action == Directions.STOP: features['stop'] = 1
+        rev = Directions.REVERSE[gameState.getAgentState(self.index).configuration.direction]
+        if action == rev: features['reverse'] = 1
+
+        return features
+        """
+        #Original Code
         successor = self.getSuccessor(gameState, action)
         myState = successor.getAgentState(self.index)
         myPos = myState.getPosition()
         features, weights = self.initFeaturesWeights(gameState, action)
 
         features['onDefense'] = 1  # Computes whether we're on defense (1) or offense (0)
-        # if myState.isPacman: features['onDefense'] = 0
-
-        features['knownFarEnemy'] = self.getMazeDistance(myPos, self.lastEatenFood)
-
-        # Provide weight
-        weights.update({'onDefense': 10000, 'knownFarEnemy': -20000})
+        if self.lastEatenFood is not None:
+            features['knownFarEnemy'] = self.getMazeDistance(myPos, self.lastEatenFood)
+            weights.update({'onDefense': 10000, 'knownFarEnemy': -20000})
+        else:
+            weights.update({'onDefense': 10000})
 
         return self.dotProduct(features, weights)
 
@@ -213,7 +285,6 @@ class myCustomAgent(CaptureAgent):
         features['isDeadLock'] = self.isDeadLock(gameState, action)
 
         weights = {'stop': -100, 'reverse': -10, 'partnerDistance': 55, 'isDeadLock': -600}
-
         return (features, weights)
 
     def getLocation(self, gameState, action):

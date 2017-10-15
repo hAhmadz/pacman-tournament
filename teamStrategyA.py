@@ -422,18 +422,3 @@ class myCustomAgent(CaptureAgent):
         # for enemyIndex in enemies:
         #     if self.pacmanInEnemyLoc(enemyIndex):
         #         self.lastEatenFood = ()
-
-    """
-    #Commented code to track enemy location in own / your area
-    currentPlayer = gameState.getAgentState(self.index)
-    closestEnemies = self.getClosestEnemiesDist(gameState)
-    enemyLoc = self.getEnemyLocations(gameState)
-    for enemyAgent, enemyCoords in enemyLoc:
-        enemyPlayer = gameState.getAgentState(enemyAgent)
-        enemyLoc = self.PacmanInEnemyLoc(enemyPlayer)
-        agentLoc = self.PacmanInEnemyLoc(currentPlayer)
-        if enemyLoc == True:
-            #Enemy in your area
-        if enemyLoc == False and agentLoc == False:
-            #Enemy and agent both in own areas
-        """
